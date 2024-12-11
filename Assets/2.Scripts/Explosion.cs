@@ -12,7 +12,7 @@ public class Explosion : MonoBehaviour
 	[SerializeField] private float _explosionArea;
 	[SerializeField] private float _explosionForce = 1000;
 	[SerializeField] private GameObject _effect;
-	private GameObject _playerHips = null;
+	[SerializeField] private GameObject _playerHips = null;
 	private Rigidbody _playerRb;
     #endregion
 
@@ -20,17 +20,20 @@ public class Explosion : MonoBehaviour
 
     private void Update()
     {
-		if(_playerHips != null && Vector3.Distance(_explosionCamera.transform.position, _playerHips.transform.position) < 5)
+		
+		if(_playerHips != null && Vector3.Distance(_explosionCamera.transform.position, _playerHips.transform.position) > 5)
 		{
 			_explosionCamera.transform.LookAt(_playerHips.transform.position);
 			_explosionCamera.transform.Translate(_explosionCamera.transform.forward * Time.deltaTime * 2, Space.Self);
 			//Resetear Player
-			if(_playerRb.velocity.magnitude < 3)
+			
+			if(_playerRb.velocity.magnitude < 3 )
 			{
+				Debug.Log("Hola");
+				_playerHips.transform.parent.GetComponent<CharacterController>().enabled = false; //Character controller no permite un teletransporte
                 _mainCamera.enabled = true;
                 _explosionCamera.enabled = false;
 				Vector3 currentPos = _playerHips.transform.position;
-				_playerHips.transform.parent.GetComponent<CharacterController>().enabled = false; //Character controller no permite un teletransporte
 				_playerHips.transform.localPosition = Vector3.zero;
 				_playerHips.transform.parent.position = currentPos;
                 _playerHips.transform.parent.GetComponent<CharacterController>().enabled = true;
@@ -54,9 +57,12 @@ public class Explosion : MonoBehaviour
 		_playerHips = playerAnim.transform.GetChild(0).gameObject;
 		_playerRb = playerAnim.GetComponentInChildren<Rigidbody>();
 		if (playerAnim != null)
+		{
 			playerAnim.enabled = false;
 
-		ExplosionForce();
+		}
+
+        ExplosionForce();
 	}
 
 	private void OnDrawGizmos()
