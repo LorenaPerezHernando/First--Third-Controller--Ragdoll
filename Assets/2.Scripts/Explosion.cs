@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+using System.Collections;
 
 public class Explosion : MonoBehaviour
 {
@@ -13,7 +14,7 @@ public class Explosion : MonoBehaviour
 	[SerializeField] private float _explosionForce = 1000;
 	[SerializeField] private GameObject _effect;
 	[SerializeField] private GameObject _playerHips = null;
-	private Rigidbody _playerRb;
+	private Rigidbody _playerRb = null;
     #endregion
 
     #region Unity Callbacks
@@ -29,28 +30,20 @@ public class Explosion : MonoBehaviour
 		if(_playerHips != null && Vector3.Distance(_explosionCamera.transform.position, _playerHips.transform.position) > 5)
 		{
 			_explosionCamera.transform.LookAt(_playerHips.transform.position);
-			_explosionCamera.transform.Translate(_explosionCamera.transform.forward * Time.deltaTime * 2, Space.Self);
-			//Resetear Player
-			
-			if(_playerRb.velocity.magnitude < 3 )
+            //_explosionCamera.transform.Translate(_explosionCamera.transform.forward * Time.deltaTime * 2, Space.Self);
+            Vector3 directionToPlayer = (_playerHips.transform.position - _explosionCamera.transform.position).normalized;
+            _explosionCamera.transform.position += directionToPlayer * Time.deltaTime * 2;
+
+            //Resetear Player
+
+            if (_playerRb.velocity.magnitude < 1 )
 			{
+				StartCoroutine(RagDollMoment());
 				Debug.Log("Hola");
-				_playerHips.transform.parent.GetComponent<CharacterController>().enabled = false; //Character controller no permite un teletransporte
-                _mainCamera.enabled = true;
-                _explosionCamera.enabled = false;
-				Vector3 currentPos = _playerHips.transform.position;
-				_playerHips.transform.localPosition = Vector3.zero;
-				_playerHips.transform.parent.position = currentPos;
-                _playerHips.transform.parent.GetComponent<CharacterController>().enabled = true;
-				//Levantarse
-				
-
-                _playerHips.transform.parent.GetComponent<Animator>().SetTrigger("StandUp");
-				_playerHips.transform.parent.GetComponent<Animator>().enabled = true;
-                Destroy(gameObject);
+                
 
 
-            }
+			}
 		}
     }
     private void OnTriggerEnter(Collider other)
@@ -97,19 +90,27 @@ public class Explosion : MonoBehaviour
 		}
 	}
 
-	//private void Sta
-
-	private void AlignPosToHips() //Para empezar a caminar desde donde cayó
+	IEnumerator RagDollMoment()
 	{
-		Vector3 originalHipsPos = _playerHips.transform.position;
-		transform.position = _playerHips.transform.position;
+		yield return new WaitForSeconds(5);
+        RagDollFinish();
+    }
 
-		if(Physics.Raycast(transform.position, Vector3.down, out RaycastHit hitInfo))
-		{
-			transform.position = new Vector3(transform.position.x, hitInfo.point.y, hitInfo.point.z);
-		}
-		_playerHips.transform.position = originalHipsPos;
-	}
+	private void RagDollFinish()
+	{
+        _mainCamera.enabled = true;
+        _explosionCamera.enabled = false;
+        Vector3 currentPos = _playerHips.transform.position;
+        _playerHips.transform.parent.GetComponent<CharacterController>().enabled = false; //Character controller no permite un teletransporte
+        _playerHips.transform.localPosition = Vector3.zero;
+        _playerHips.transform.parent.position = currentPos;
+        //Levantarse
+
+        _playerHips.transform.parent.GetComponent<CharacterController>().enabled = true;
+        _playerHips.transform.parent.GetComponent<Animator>().SetTrigger("StandUp");
+        _playerHips.transform.parent.GetComponent<Animator>().enabled = true;
+        Destroy(gameObject);
+    }
 
 
 	#endregion
