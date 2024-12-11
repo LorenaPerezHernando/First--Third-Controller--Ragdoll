@@ -18,6 +18,11 @@ public class Explosion : MonoBehaviour
 
     #region Unity Callbacks
 
+    private void Start()
+    {
+       
+    }
+
     private void Update()
     {
 		
@@ -38,8 +43,11 @@ public class Explosion : MonoBehaviour
 				_playerHips.transform.parent.position = currentPos;
                 _playerHips.transform.parent.GetComponent<CharacterController>().enabled = true;
 				//Levantarse
+				
+
+                _playerHips.transform.parent.GetComponent<Animator>().SetTrigger("StandUp");
 				_playerHips.transform.parent.GetComponent<Animator>().enabled = true;
-				Destroy(gameObject);
+                Destroy(gameObject);
 
 
             }
@@ -87,6 +95,20 @@ public class Explosion : MonoBehaviour
 				objectRB.AddExplosionForce(_explosionForce, transform.position, _explosionArea);
 			}
 		}
+	}
+
+	//private void Sta
+
+	private void AlignPosToHips() //Para empezar a caminar desde donde cayó
+	{
+		Vector3 originalHipsPos = _playerHips.transform.position;
+		transform.position = _playerHips.transform.position;
+
+		if(Physics.Raycast(transform.position, Vector3.down, out RaycastHit hitInfo))
+		{
+			transform.position = new Vector3(transform.position.x, hitInfo.point.y, hitInfo.point.z);
+		}
+		_playerHips.transform.position = originalHipsPos;
 	}
 
 
