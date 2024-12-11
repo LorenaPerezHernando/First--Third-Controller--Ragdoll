@@ -30,13 +30,18 @@ public class Explosion : MonoBehaviour
 		if(_playerHips != null && Vector3.Distance(_explosionCamera.transform.position, _playerHips.transform.position) > 5)
 		{
 			_explosionCamera.transform.LookAt(_playerHips.transform.position);
-            //_explosionCamera.transform.Translate(_explosionCamera.transform.forward * Time.deltaTime * 2, Space.Self);
-            Vector3 directionToPlayer = (_playerHips.transform.position - _explosionCamera.transform.position).normalized;
-            _explosionCamera.transform.position += directionToPlayer * Time.deltaTime * 2;
+			Vector3 directionToPlayer = (_playerHips.transform.position - _explosionCamera.transform.position).normalized;
+			_explosionCamera.transform.position += directionToPlayer * Time.deltaTime * 2;
 
-            //Resetear Player
+			//Vector3 directionToMainCamera = (_mainCamera.transform.position - _explosionCamera.transform.position).normalized;
 
-            if (_playerRb.velocity.magnitude < 1 )
+			//// Mover la cámara principal hacia la cámara inactiva
+			//_explosionCamera.transform.position += directionToMainCamera * Time.deltaTime * 2;
+
+
+			//Resetear Player
+
+			if (_playerRb.velocity.magnitude < 1 )
 			{
 				StartCoroutine(RagDollMoment());
 				Debug.Log("Hola");
@@ -92,7 +97,7 @@ public class Explosion : MonoBehaviour
 
 	IEnumerator RagDollMoment()
 	{
-		yield return new WaitForSeconds(5);
+		yield return new WaitForSeconds(10);
         RagDollFinish();
     }
 
