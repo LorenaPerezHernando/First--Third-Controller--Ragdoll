@@ -26,6 +26,7 @@ public class Explosion : MonoBehaviour
 
     private void Update()
     {
+	
 		
 		if(_playerHips != null && Vector3.Distance(_explosionCamera.transform.position, _playerHips.transform.position) > 5)
 		{
